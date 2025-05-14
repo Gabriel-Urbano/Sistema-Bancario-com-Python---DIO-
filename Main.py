@@ -1,16 +1,21 @@
 #Adicionando biblioteca
 from time import sleep
+
 #Codigo Principal do Sistema Bancario desenvolvodp para o desafio do DIO
 
 #Declaracao de variaveis Globais
 saldo = 0
 limite_saque = 0
+extrato = list()
 
 #Declaracao de funcoes
 def titulo(msg):
     titulo = f'{"="*54} \n{msg:^54} \n{"="*54}'
     return titulo
 
+
+def linha():
+    print('-' * 54)
 
 def vericaint(msg): #verifica se o numero digitado é um número inteiro
         num = None
@@ -27,10 +32,10 @@ def vericaint(msg): #verifica se o numero digitado é um número inteiro
             else: 
                 return num
             
-def menu(saldo, limite_saque = limite_saque):
+def menu(saldo, extrato, limite_saque = limite_saque):
     opc = 0
     print(titulo('Bem vindo ao Caixa Eletronico'))
-    print(f"Saldo Disponível: {saldo:.2f}. \n\n"\
+    print(f"Saldo Disponível: R${saldo:.2f}. \n\n"\
     "Digite uma das opções para continuar:\n\n" \
     "1 - Saque\n" \
     "2 - Deposito.\n" \
@@ -41,95 +46,122 @@ def menu(saldo, limite_saque = limite_saque):
         opc = vericaint("\nOpcão desejada: ")
         if opc == 1:
             print('\n')
-            saldo, limite_saque = saque(saldo, limite_saque)
-            return saldo, limite_saque, False
+            saldo, extrato, limite_saque = saque(saldo, extrato, limite_saque)
+            return saldo, extrato, limite_saque, False
         elif opc == 2:
             print('\n')
-            saldo, limite_saque = deposito(saldo, limite_saque)
-            return saldo, limite_saque, False
+            saldo, extrato, limite_saque = deposito(saldo, extrato, limite_saque)
+            return saldo, extrato, limite_saque, False
+        elif opc == 3:
+            lerextrato(extrato)
+            return saldo, extrato, limite_saque, False
         elif opc == 4:
             print(titulo('Obrigado por utilizar nossos seriços. Volte Sempre!'))
-            return saldo, limite_saque, True
-            
-            
-        
+            return saldo, extrato,  limite_saque, True
         else:
             print('Opção invalída. Tente Novamente')
-            return saldo, limite_saque
+            return saldo, extrato, limite_saque, False
 
 
-def saque(saldo, limite_saque):
-    print(titulo('SAQUE'))
-    print(f'Saldo Disponível: {saldo}\n')
+def saque(saldo, extrato, limite_saque):
     if limite_saque < 3:
+        print(titulo('SAQUE'))
+        print(f'Saldo Disponível: R${saldo:.2f}\n')
         while True:
             saque = vericaint('Digite o valor que deseja sacar [0 para cancelar]\nR$')
 
-            while saque < 0:
-                print('\n\33[0;31mValor digitado é invalido.\033[m\n')
-                saque = vericaint('Digite o valor que deseja sacar [0 para cancelar]\nR$')
-
-                
-            if saque == 0:
+            if saque is None:
                 print('Operacão cancelada.')
                 saldo -= saque
-                return saldo, limite_saque
+                return saldo, extrato,  limite_saque
+ 
+            elif saque == 0:
+                print('Operacão cancelada.')
+                saldo -= saque
+                return saldo, extrato,  limite_saque
+            
+            elif saque < 0:
+                print('\n\33[0;31mValor digitado é invalido.\033[m\n')
+                continue
             
             elif saque > 2000:
                 print('\nNão é possível realizar saques maiores que R$2.000,00.')
                 sleep(1)
-                return saldo, limite_saque
+                continue
 
-            elif saldo > saque:
+            elif saldo >= saque:
                 saldo -= saque
                 print('\nSaque realizado com sucesso.')
+                extrato.append({'tipo': 'Saque', 'valor': saque, 'extsaldo' : saldo})
                 limite_saque +=1
                 sleep(1)
-                return saldo, limite_saque
-        
-            
+                return saldo, extrato, limite_saque
+
             else:
                 print('\n\33[0;31mSaldo indisponível.\033[m\n')
     else:
 
         print('Limite de saque diário atingido, Tente Novamente amanhã.')
-        return saldo, limite_saque
+        return saldo, extrato, limite_saque
     
 
 
 
-def deposito(saldo, limite_saque = limite_saque):
+def deposito(saldo, extrato, limite_saque = limite_saque):
 
     print(titulo('DEPÓSITO'))
-    print(f'Saldo Disponível: {saldo}\n')
+    print(f'Saldo Disponível: R${saldo:.2f}\n')
     while True:
-        deposito = vericaint('Digite o valor que deseja depositar [0 para cancelar].\nR$')
+        valor = vericaint('Digite o valor que deseja depositar [0 para cancelar].\nR$')
 
-        while deposito  < 0:
-            print('\n\33[0;31mValor digitado é invalido.\033[m\n')
-            deposito = vericaint('Digite o valor que deseja depositar [0 para cancelar].\nR$')
-
-        if deposito == 0:
+        if valor is None:
             print('Operação cancelada.')
-            return saldo, limite_saque
+            return saldo, extrato, limite_saque
+
+        if valor  < 0:
+            print('\n\33[0;31mValor digitado é invalido.\033[m\n')
+            continue
+
+        elif valor == 0:
+            print('Operação cancelada.')
+            return saldo, extrato, limite_saque
 
         else:
-            saldo += deposito
+            saldo += valor
             print('\nDeposito realizado com sucesso.')
             sleep(1)
-            return saldo, limite_saque
+            extrato.append({'tipo': 'Depósito', 'valor': valor, 'extsaldo' : saldo})
+            return saldo, extrato, limite_saque
 
 
+def lerextrato(extrato):
+    if not extrato: #Verifica se há algum extrato
+        print('Não há transsações para exibir.')
+    else:
 
+        print(f'\n{titulo('Extrato')}')
+        print(f'{'Tipo':<17}|{'Valor':<17}|{'Saldo':<17}|')
+        
+        for transacao in extrato:
+            print(f'{transacao.get('tipo', ''):<17}|'\
+            f'R$ {transacao.get('valor', '0'):<14.2f}|'\
+            f'R$ {transacao.get('extsaldo'):<14.2f}|')
+        linha()
+       
+    
 #Corpo do Codigo
 
 while True:
-    saldo, limite_saque, sair = menu(saldo, limite_saque)
+    saldo, extrato, limite_saque, sair = menu(saldo, extrato, limite_saque)
 
     if sair:
         break
 
     resp = input('\nDeseja realizar outra operação? [S/N]\n').upper()
+    while resp not in 'NS':
+        resp = input('\n\33[0;31mResposta invalida.\033[m\n'
+        'Deseja realizar outra operação? [S/N]\n').upper()
+
     if resp == 'N':
         print(titulo('Obrigado por utilizar nossos seriços. Volte Sempre!'))
         break
