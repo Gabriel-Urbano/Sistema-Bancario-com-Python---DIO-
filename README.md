@@ -44,3 +44,5 @@ Opcão desejada:
 Autor: Gabriel Urbano
 
 Data de Criação: 14/05/2025
+
+[Linkedin](www.linkedin.com/in/gabriel-urbano-de-souza-ferreira-9b0947200)
