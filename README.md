@@ -7,6 +7,10 @@ Este projeto simula um sistema de caixa eletrônico com funcionalidades essencia
 
 - Extrato: Exibe um histórico das transações realizadas na conta, mostrando o tipo de transação (saque ou depósito), o valor e o saldo atual.
 
+- Criar Usuário: Permite cadastrar um novo usuário no sistema, solicitando informações como CPF, nome e endereço.
+
+- Criar Conta Corrente: Permite criar uma nova conta corrente para um usuário cadastrado.
+
 ## 💻 PRINCIPAIS TECNOLOGIAS UTILIZADAS
 Linguagem de Programação: Python
 
